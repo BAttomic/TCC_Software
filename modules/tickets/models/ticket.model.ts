@@ -36,8 +36,6 @@ const TicketSchema = new Schema<ITicket>(
   { timestamps: true },
 );
 
-// Indexes
-TicketSchema.index({ code: 1 });
 TicketSchema.index({ ownerId: 1 });
 TicketSchema.index({ eventId: 1, status: 1 });
 TicketSchema.index({ orderId: 1 });

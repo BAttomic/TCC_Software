@@ -1,31 +1,14 @@
-import NextAuth, { type DefaultSession } from "next-auth";
+import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/db";
 import { LoginSchema } from "@/modules/identity/schemas/user.schema";
 import { findByEmail } from "@/modules/identity/repositories/user.repository";
-import { env } from "@/lib/env";
 import { consumeRateLimit } from "@/lib/rate-limit";
-
-type AppRole = "buyer" | "organizer" | "operator" | "admin";
-
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-      role: AppRole;
-    } & DefaultSession["user"];
-  }
-}
+import { authConfig } from "@/lib/auth.config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  trustHost: true,
-  secret: env.NEXTAUTH_SECRET,
-  session: { strategy: "jwt", maxAge: 60 * 60 },
-  jwt: { maxAge: 60 * 60 },
-  pages: {
-    signIn: "/login",
-  },
+  ...authConfig,
   providers: [
     Credentials({
       name: "credentials",
@@ -70,20 +53,4 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.userId = user.id;
-        token.role = user.role as AppRole;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = (token.userId as string) ?? "";
-        session.user.role = (token.role as AppRole) ?? "buyer";
-      }
-      return session;
-    },
-  },
 });

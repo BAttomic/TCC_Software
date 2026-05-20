@@ -34,8 +34,6 @@ const UserSchema = new Schema<IUser>(
   { timestamps: true },
 );
 
-// Index
-UserSchema.index({ email: 1 });
 UserSchema.index({ role: 1 });
 
 // Prevent overwriting the model on hot reload (Next.js dev)

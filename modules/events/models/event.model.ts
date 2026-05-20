@@ -52,8 +52,6 @@ const EventSchema = new Schema<IEvent>(
   { timestamps: true },
 );
 
-// Indexes
-EventSchema.index({ slug: 1 });
 EventSchema.index({ status: 1, startsAt: -1 });
 EventSchema.index({ "venue.city": 1 });
 
