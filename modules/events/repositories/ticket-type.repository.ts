@@ -1,0 +1,1 @@
+export * from "../../../src/modules/events/repositories/ticket-type.repository";

@@ -1,0 +1,1 @@
+export { default } from "../src/modules/tickets/models/checkin-log.model";

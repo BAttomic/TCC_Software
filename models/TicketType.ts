@@ -1,0 +1,1 @@
+export { default } from "../src/modules/events/models/ticket-type.model";

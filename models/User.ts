@@ -1,0 +1,1 @@
+export { default } from "../src/modules/identity/models/user.model";

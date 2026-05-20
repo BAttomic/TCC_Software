@@ -1,0 +1,1 @@
+export * from "../../../src/modules/tickets/schemas/ticket.schema";

@@ -1,0 +1,1 @@
+export * from "../../../src/modules/identity/repositories/user.repository";

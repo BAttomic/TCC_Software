@@ -11,7 +11,10 @@ TicketFlow segue abordagem modular por dominio em src/modules e composicao web n
 - notifications/payments/checkin: preparados para evolucao em fases seguintes
 
 ## Estrutura principal
-- app: paginas e route handlers
+- app: paginas e route handlers organizados por route groups
+- app/(auth): login, register e reset de senha
+- app/(platform): areas autenticadas como pedidos e gestao de eventos
+- app/(platform)/eventos: listagem, detalhe e checkout dos eventos
 - src/lib: infraestrutura (db, env, logger, auth, rate-limit)
 - src/modules: modelos, schemas e repositorios por dominio
 - src/server/actions: server actions

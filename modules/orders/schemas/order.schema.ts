@@ -1,0 +1,1 @@
+export * from "../../../src/modules/orders/schemas/order.schema";
