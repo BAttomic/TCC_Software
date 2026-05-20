@@ -1,1 +1,3 @@
-export * from "../src/lib/mongo-collections";
+export function tccCollectionName(name: string): string {
+  return `tcc_${name}`;
+}

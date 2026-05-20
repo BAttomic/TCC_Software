@@ -104,5 +104,8 @@ docker-compose.override.yml
 dist/
 build/
 
+# Screenshots
+/screenshots/
+
 # Claude
 .claude/

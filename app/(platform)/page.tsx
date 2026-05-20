@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { connectDB } from "@/lib/db";
 import { findFeaturedPublished } from "@/modules/events/repositories/event.repository";
+import { auth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,9 @@ function currencyBRL(value: number) {
 }
 
 export default async function HomePage() {
+  const session = await auth();
+  const role = session?.user?.role as string | undefined;
+
   let highlights = {
     upcoming: [] as Awaited<ReturnType<typeof findFeaturedPublished>>["upcoming"],
     largest: [] as Awaited<ReturnType<typeof findFeaturedPublished>>["largest"],
@@ -174,37 +178,75 @@ export default async function HomePage() {
         </div>
 
         <aside className="lg:sticky lg:top-6">
-          <Card className="overflow-hidden border-slate-200 bg-slate-950 text-white shadow-2xl shadow-slate-300/60">
-            <div className="bg-[radial-gradient(circle_at_top,_rgba(251,191,36,0.22)_0,_transparent_35%),linear-gradient(180deg,_rgba(15,23,42,1),_rgba(30,41,59,1))] p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-300">Minha conta</p>
-              <h2 className="mt-2 text-3xl font-black tracking-tight">Entrar ou criar conta</h2>
-              <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                Acesse seus pedidos, ingressos e eventos favoritos. Se for novo por aqui, o cadastro leva menos de um minuto.
-              </p>
-              <div className="mt-6 flex flex-col gap-3">
-                <Button asChild size="lg" className="rounded-2xl bg-white text-slate-950 hover:bg-slate-100">
-                  <Link href="/login">Entrar</Link>
-                </Button>
-                <Button asChild size="lg" variant="outline" className="rounded-2xl border-slate-500 bg-transparent text-white hover:bg-white/10">
-                  <Link href="/register">Criar conta</Link>
-                </Button>
+          {session ? (
+            <Card className="overflow-hidden border-slate-200 bg-slate-950 text-white shadow-2xl shadow-slate-300/60">
+              <div className="bg-[radial-gradient(circle_at_top,_rgba(251,191,36,0.22)_0,_transparent_35%),linear-gradient(180deg,_rgba(15,23,42,1),_rgba(30,41,59,1))] p-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-300">Minha conta</p>
+                <h2 className="mt-2 text-2xl font-black tracking-tight">Olá, {session.user?.name?.split(" ")[0]}</h2>
+                <p className="mt-2 text-sm text-slate-300 capitalize">{role}</p>
+                <div className="mt-6 flex flex-col gap-3">
+                  <Button asChild size="lg" className="rounded-2xl bg-white text-slate-950 hover:bg-slate-100">
+                    <Link href="/tickets">Meus ingressos</Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline" className="rounded-2xl border-slate-500 bg-transparent text-white hover:bg-white/10">
+                    <Link href="/orders">Meus pedidos</Link>
+                  </Button>
+                  {(role === "organizer" || role === "admin") && (
+                    <Button asChild size="lg" variant="outline" className="rounded-2xl border-slate-500 bg-transparent text-white hover:bg-white/10">
+                      <Link href="/organizer/eventos">Painel organizador</Link>
+                    </Button>
+                  )}
+                  {role === "admin" && (
+                    <Button asChild size="lg" variant="outline" className="rounded-2xl border-slate-500 bg-transparent text-white hover:bg-white/10">
+                      <Link href="/admin/usuarios">Painel admin</Link>
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-            <CardContent className="space-y-4 bg-white p-6 text-slate-700">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">O que voce encontra</p>
-                <ul className="mt-3 space-y-3 text-sm leading-relaxed">
-                  <li>• Eventos em destaque com selecao por data e volume.</li>
-                  <li>• Acesso rapido para login e cadastro.</li>
-                  <li>• Direcionamento para compra em poucos cliques.</li>
-                </ul>
+              <CardContent className="space-y-4 bg-white p-6 text-slate-700">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Acesso rapido</p>
+                  <ul className="mt-3 space-y-3 text-sm leading-relaxed">
+                    <li>• Acompanhe seus pedidos em tempo real.</li>
+                    <li>• Veja e use seus ingressos com QR Code.</li>
+                    <li>• Explore novos eventos na sua cidade.</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="overflow-hidden border-slate-200 bg-slate-950 text-white shadow-2xl shadow-slate-300/60">
+              <div className="bg-[radial-gradient(circle_at_top,_rgba(251,191,36,0.22)_0,_transparent_35%),linear-gradient(180deg,_rgba(15,23,42,1),_rgba(30,41,59,1))] p-6">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-300">Minha conta</p>
+                <h2 className="mt-2 text-3xl font-black tracking-tight">Entrar ou criar conta</h2>
+                <p className="mt-3 text-sm leading-relaxed text-slate-300">
+                  Acesse seus pedidos, ingressos e eventos favoritos. Se for novo por aqui, o cadastro leva menos de um minuto.
+                </p>
+                <div className="mt-6 flex flex-col gap-3">
+                  <Button asChild size="lg" className="rounded-2xl bg-white text-slate-950 hover:bg-slate-100">
+                    <Link href="/login">Entrar</Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline" className="rounded-2xl border-slate-500 bg-transparent text-white hover:bg-white/10">
+                    <Link href="/register">Criar conta</Link>
+                  </Button>
+                </div>
               </div>
-              <div className="rounded-2xl bg-slate-100 p-4">
-                <p className="text-sm font-semibold text-slate-900">Popular agora</p>
-                <p className="mt-1 text-sm text-slate-600">Dois blocos dinamicos mostram o que vem primeiro e o que tem maior escala.</p>
-              </div>
-            </CardContent>
-          </Card>
+              <CardContent className="space-y-4 bg-white p-6 text-slate-700">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">O que voce encontra</p>
+                  <ul className="mt-3 space-y-3 text-sm leading-relaxed">
+                    <li>• Eventos em destaque com selecao por data e volume.</li>
+                    <li>• Acesso rapido para login e cadastro.</li>
+                    <li>• Direcionamento para compra em poucos cliques.</li>
+                  </ul>
+                </div>
+                <div className="rounded-2xl bg-slate-100 p-4">
+                  <p className="text-sm font-semibold text-slate-900">Popular agora</p>
+                  <p className="mt-1 text-sm text-slate-600">Dois blocos dinamicos mostram o que vem primeiro e o que tem maior escala.</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </aside>
       </section>
       <div className="border-t border-slate-200/70 py-6 text-center text-sm text-slate-500">
