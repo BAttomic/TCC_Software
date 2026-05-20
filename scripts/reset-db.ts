@@ -1,5 +1,5 @@
 /**
- * Drops all collections in the current MongoDB database.
+ * Drops only tcc_ collections in the current MongoDB database.
  * Run with: npx tsx scripts/reset-db.ts
  */
 import mongoose from "mongoose";
@@ -11,6 +11,10 @@ async function main() {
 
   const collections = await mongoose.connection.db!.collections();
   for (const collection of collections) {
+    if (!collection.collectionName.startsWith("tcc_")) {
+      continue;
+    }
+
     await collection.drop();
     console.log("Dropped collection:", collection.collectionName);
   }

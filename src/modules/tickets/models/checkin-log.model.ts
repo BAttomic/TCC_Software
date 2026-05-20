@@ -1,4 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
+import { tccCollectionName } from "@/lib/mongo-collections";
 
 export interface ICheckinLog {
   _id: string;
@@ -25,4 +26,4 @@ const CheckinLogSchema = new Schema<ICheckinLog>(
 CheckinLogSchema.index({ ticketId: 1 });
 CheckinLogSchema.index({ eventId: 1, occurredAt: -1 });
 
-export default mongoose.models.CheckinLog || model<ICheckinLog>("CheckinLog", CheckinLogSchema);
+export default mongoose.models.CheckinLog || model<ICheckinLog>("CheckinLog", CheckinLogSchema, tccCollectionName("checkin_logs"));

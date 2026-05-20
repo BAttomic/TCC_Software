@@ -1,4 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
+import { tccCollectionName } from "@/lib/mongo-collections";
 
 export interface ITicketType {
   _id: string;
@@ -28,4 +29,4 @@ const TicketTypeSchema = new Schema<ITicketType>(
 
 TicketTypeSchema.index({ eventId: 1 });
 
-export default mongoose.models.TicketType || model<ITicketType>("TicketType", TicketTypeSchema);
+export default mongoose.models.TicketType || model<ITicketType>("TicketType", TicketTypeSchema, tccCollectionName("ticket_types"));

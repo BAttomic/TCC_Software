@@ -1,4 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
+import { tccCollectionName } from "@/lib/mongo-collections";
 
 export interface ILot {
   _id: string;
@@ -30,4 +31,4 @@ const LotSchema = new Schema<ILot>(
 LotSchema.index({ ticketTypeId: 1, active: 1 });
 LotSchema.index({ startsAt: 1, endsAt: 1 });
 
-export default mongoose.models.Lot || model<ILot>("Lot", LotSchema);
+export default mongoose.models.Lot || model<ILot>("Lot", LotSchema, tccCollectionName("lots"));

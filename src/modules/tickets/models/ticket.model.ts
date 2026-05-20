@@ -1,4 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
+import { tccCollectionName } from "@/lib/mongo-collections";
 
 export enum TicketStatus {
   VALID = "valid",
@@ -41,4 +42,4 @@ TicketSchema.index({ ownerId: 1 });
 TicketSchema.index({ eventId: 1, status: 1 });
 TicketSchema.index({ orderId: 1 });
 
-export default mongoose.models.Ticket || model<ITicket>("Ticket", TicketSchema);
+export default mongoose.models.Ticket || model<ITicket>("Ticket", TicketSchema, tccCollectionName("tickets"));

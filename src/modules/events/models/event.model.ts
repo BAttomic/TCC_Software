@@ -1,4 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
+import { tccCollectionName } from "@/lib/mongo-collections";
 
 export enum EventStatus {
   DRAFT = "draft",
@@ -56,4 +57,4 @@ EventSchema.index({ slug: 1 });
 EventSchema.index({ status: 1, startsAt: -1 });
 EventSchema.index({ "venue.city": 1 });
 
-export default mongoose.models.Event || model<IEvent>("Event", EventSchema);
+export default mongoose.models.Event || model<IEvent>("Event", EventSchema, tccCollectionName("events"));

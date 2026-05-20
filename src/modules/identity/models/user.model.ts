@@ -1,4 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
+import { tccCollectionName } from "@/lib/mongo-collections";
 
 export enum UserRole {
   BUYER = "buyer",
@@ -38,4 +39,4 @@ UserSchema.index({ email: 1 });
 UserSchema.index({ role: 1 });
 
 // Prevent overwriting the model on hot reload (Next.js dev)
-export default mongoose.models.User || model<IUser>("User", UserSchema);
+export default mongoose.models.User || model<IUser>("User", UserSchema, tccCollectionName("users"));

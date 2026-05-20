@@ -1,4 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
+import { tccCollectionName } from "@/lib/mongo-collections";
 
 export enum OrderStatus {
   PENDING = "pending",
@@ -53,4 +54,4 @@ const OrderSchema = new Schema<IOrder>(
 OrderSchema.index({ buyerId: 1, createdAt: -1 });
 OrderSchema.index({ status: 1, expiresAt: 1 });
 
-export default mongoose.models.Order || model<IOrder>("Order", OrderSchema);
+export default mongoose.models.Order || model<IOrder>("Order", OrderSchema, tccCollectionName("orders"));
