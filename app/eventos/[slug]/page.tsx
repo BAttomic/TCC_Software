@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { connectDB } from "@/lib/db";
 import { findBySlug } from "@/modules/events/repositories/event.repository";
 
+export const dynamic = "force-dynamic";
+
 type EventDetailsPageProps = {
   params: Promise<{ slug: string }>;
 };

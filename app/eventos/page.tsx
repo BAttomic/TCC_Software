@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { connectDB } from "@/lib/db";
 import { findPublishedFiltered } from "@/modules/events/repositories/event.repository";
 
+export const dynamic = "force-dynamic";
+
 type EventosPageProps = {
   searchParams: Promise<{
     busca?: string;
