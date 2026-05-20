@@ -4,8 +4,10 @@ import User, { IUser, UserRole } from "../models/user.model";
 const UserModel = User as unknown as {
   create(data: any): Promise<any>;
   findOne(filter: Record<string, unknown>): any;
+  find(filter: Record<string, unknown>): any;
   findById(id: string): any;
   findByIdAndUpdate(id: string, data: Record<string, unknown>, options: Record<string, unknown>): any;
+  findByIdAndDelete(id: string): any;
   insertMany(docs: any[]): Promise<any[]>;
 };
 
@@ -21,8 +23,23 @@ export async function findById(id: string): Promise<IUser | null> {
   return (await UserModel.findById(id).lean()) as unknown as (IUser | null);
 }
 
+export async function findAllUsers(): Promise<IUser[]> {
+  return (await UserModel.find({}).sort({ createdAt: -1 }).lean()) as unknown as IUser[];
+}
+
 export async function updatePasswordById(id: string, passwordHash: string): Promise<IUser | null> {
   return (await UserModel.findByIdAndUpdate(id, { passwordHash }, { new: true }).lean()) as unknown as (IUser | null);
+}
+
+export async function updateUserById(
+  id: string,
+  data: Partial<Pick<IUser, "email" | "name" | "role" | "phone" | "cpf" | "emailVerifiedAt">> & { passwordHash?: string },
+): Promise<IUser | null> {
+  return (await UserModel.findByIdAndUpdate(id, data, { new: true }).lean()) as unknown as (IUser | null);
+}
+
+export async function deleteUserById(id: string): Promise<IUser | null> {
+  return (await UserModel.findByIdAndDelete(id).lean()) as unknown as (IUser | null);
 }
 
 export async function createDemoUsers(): Promise<IUser[]> {

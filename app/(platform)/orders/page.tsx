@@ -24,7 +24,7 @@ export default async function OrdersPage() {
   const orders = await findByBuyerId(session.user.id);
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-6xl px-4 py-10 sm:px-6">
+    <main className="mx-auto min-h-screen w-full max-w-[96rem] px-4 py-10 sm:px-6">
       <div className="mb-8 rounded-2xl border border-slate-200 bg-gradient-to-r from-amber-50 via-white to-sky-50 p-6">
         <p className="text-sm uppercase tracking-[0.25em] text-slate-500">Pedidos</p>
         <h1 className="mt-2 text-3xl font-bold text-slate-950">Acompanhe suas compras simuladas</h1>

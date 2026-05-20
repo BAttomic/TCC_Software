@@ -25,14 +25,14 @@ export default async function HomePage() {
 
   try {
     await connectDB();
-    highlights = await findFeaturedPublished(4);
+    highlights = await findFeaturedPublished(4, "Viçosa");
   } catch {
     dbUnavailable = true;
   }
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_12%_10%,_rgba(251,191,36,0.22)_0,_transparent_28%),radial-gradient(circle_at_88%_15%,_rgba(96,165,250,0.18)_0,_transparent_28%),linear-gradient(to_bottom,_#ffffff,_#f8fafc_50%,_#eef2ff)]">
-      <section className="mx-auto grid w-full max-w-7xl gap-8 px-4 pb-14 pt-10 sm:px-6 lg:grid-cols-[1.4fr_0.8fr] lg:items-start lg:pt-16">
+      <section className="mx-auto grid w-full max-w-[96rem] gap-8 px-4 pb-14 pt-10 sm:px-6 lg:grid-cols-[1.4fr_0.8fr] lg:items-start lg:pt-16">
         <div className="space-y-8">
           <div className="inline-flex rounded-full border border-slate-300 bg-white/80 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-700 shadow-sm">
             TicketFlow

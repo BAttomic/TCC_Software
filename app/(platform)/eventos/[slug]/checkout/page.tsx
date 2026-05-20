@@ -57,7 +57,7 @@ export default async function CheckoutPage({ params }: CheckoutPageProps) {
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-5xl px-4 py-10 sm:px-6">
+    <main className="mx-auto min-h-screen w-full max-w-[96rem] px-4 py-10 sm:px-6">
       <div className="mb-6 rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 p-6 text-white">
         <p className="text-sm uppercase tracking-[0.25em] text-slate-300">Checkout prototipo</p>
         <h1 className="mt-2 text-3xl font-bold">{event.title}</h1>

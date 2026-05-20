@@ -33,8 +33,8 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-5xl px-4 py-10 sm:px-6">
-      <OrderStatusRefresh status={order.status} />
+    <main className="mx-auto min-h-screen w-full max-w-[96rem] px-4 py-10 sm:px-6">
+      <OrderStatusRefresh orderId={order._id} status={order.status} />
 
       <Card className="border-slate-200">
         <CardHeader>

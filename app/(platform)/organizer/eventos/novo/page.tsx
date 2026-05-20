@@ -17,7 +17,7 @@ export default async function NewEventPage() {
   const later = new Date(now.getTime() + 2 * 60 * 60 * 1000);
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-4xl px-4 py-10 sm:px-6">
+    <main className="mx-auto min-h-screen w-full max-w-[96rem] px-4 py-10 sm:px-6">
       <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <p className="text-sm uppercase tracking-[0.25em] text-slate-500">Novo evento</p>
         <h1 className="mt-2 text-3xl font-bold text-slate-950">Cadastrar evento</h1>

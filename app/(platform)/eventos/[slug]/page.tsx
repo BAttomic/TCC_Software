@@ -41,7 +41,7 @@ export default async function EventDetailsPage({ params }: EventDetailsPageProps
   }
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-4xl px-4 py-10 sm:px-6">
+    <main className="mx-auto min-h-screen w-full max-w-[96rem] px-4 py-10 sm:px-6">
       <Card className="overflow-hidden border-slate-200">
         <div className="h-52 bg-gradient-to-br from-amber-200 via-rose-200 to-sky-200" />
         <CardHeader className="space-y-3">

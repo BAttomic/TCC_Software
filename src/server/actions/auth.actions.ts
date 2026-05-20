@@ -7,6 +7,7 @@ import { RegisterSchema } from "@/modules/identity/schemas/user.schema";
 import { createUser, findByEmail, updatePasswordById } from "@/modules/identity/repositories/user.repository";
 import { UserRole } from "@/modules/identity/models/user.model";
 import { saveResetToken, consumeResetToken } from "@/lib/password-reset-store";
+import { sendPasswordResetEmail } from "@/lib/email";
 
 type ActionResult = {
   ok: boolean;
@@ -54,7 +55,9 @@ export async function requestPasswordReset(emailInput: string): Promise<ActionRe
 
   const token = crypto.randomBytes(24).toString("hex");
   saveResetToken(token, user._id);
-  console.log(`[password-reset] http://localhost:3000/reset-password/${token}`);
+
+  const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password/${token}`;
+  await sendPasswordResetEmail({ to: email, name: user.name, resetUrl });
 
   return {
     ok: true,

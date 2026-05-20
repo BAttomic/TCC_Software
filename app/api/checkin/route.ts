@@ -1,0 +1,89 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
+import crypto from "crypto";
+import { connectDB } from "@/lib/db";
+import { findByCode, markUsed } from "@/modules/tickets/repositories/ticket.repository";
+import CheckinLog from "@/modules/tickets/models/checkin-log.model";
+import { env } from "@/lib/env";
+
+function verifyHmac(ticketCode: string, ownerId: string, providedSecret: string): boolean {
+  const windowSeconds = 30;
+  const nowWindow = Math.floor(Date.now() / (windowSeconds * 1000));
+
+  for (const w of [nowWindow, nowWindow - 1]) {
+    const expected = crypto
+      .createHmac("sha256", env.TICKET_HMAC_SECRET)
+      .update(`${ticketCode}:${ownerId}:${w}`)
+      .digest("hex");
+    if (crypto.timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(providedSecret.padEnd(64, "0").slice(0, 64), "hex"))) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export async function POST(request: NextRequest) {
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  if (!token || !["operator", "organizer", "admin"].includes(token.role as string)) {
+    return NextResponse.json({ ok: false, message: "Não autorizado." }, { status: 401 });
+  }
+
+  let body: { code?: string; secret?: string; deviceId?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ ok: false, message: "Payload inválido." }, { status: 400 });
+  }
+
+  const { code, secret, deviceId } = body;
+  if (!code || !secret) {
+    return NextResponse.json({ ok: false, message: "Código e secret são obrigatórios." }, { status: 400 });
+  }
+
+  await connectDB();
+
+  const ticket = await findByCode(code);
+  if (!ticket) {
+    return NextResponse.json({ ok: false, message: "Ingresso não encontrado." }, { status: 404 });
+  }
+
+  if (ticket.status === "used") {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "Ingresso já utilizado.",
+        usedAt: ticket.usedAt,
+      },
+      { status: 409 },
+    );
+  }
+
+  if (ticket.status === "cancelled") {
+    return NextResponse.json({ ok: false, message: "Ingresso cancelado." }, { status: 409 });
+  }
+
+  if (!verifyHmac(ticket.code, ticket.ownerId, secret)) {
+    return NextResponse.json({ ok: false, message: "QR Code inválido ou expirado. Peça para o comprador abrir o ingresso novamente." }, { status: 422 });
+  }
+
+  const operatorId = token.userId as string;
+  await markUsed(ticket._id, operatorId);
+
+  await CheckinLog.create({
+    ticketId: ticket._id,
+    operatorId,
+    eventId: ticket.eventId,
+    occurredAt: new Date(),
+    offline: false,
+    deviceId: deviceId ?? "web",
+  });
+
+  return NextResponse.json({
+    ok: true,
+    message: "Check-in realizado com sucesso!",
+    ticket: {
+      code: ticket.code,
+      eventId: ticket.eventId,
+    },
+  });
+}

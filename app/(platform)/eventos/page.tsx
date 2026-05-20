@@ -22,10 +22,11 @@ export default async function EventosPage({ searchParams }: EventosPageProps) {
   const events = await findPublishedFiltered({
     search: params.busca,
     city: params.cidade,
+    preferredCity: "Viçosa",
   });
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-6xl px-4 py-10 sm:px-6">
+    <main className="mx-auto min-h-screen w-full max-w-[96rem] px-4 py-10 sm:px-6">
       <div className="mb-8 rounded-2xl border border-slate-200 bg-gradient-to-r from-amber-50 via-white to-sky-50 p-6">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900">Eventos</h1>
         <p className="mt-2 text-slate-600">Descubra experiencias ao vivo e garanta seu ingresso.</p>

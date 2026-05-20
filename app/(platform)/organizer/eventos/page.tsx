@@ -17,7 +17,7 @@ export default async function OrganizerEventsPage() {
   const events = session.user.role === "admin" ? await findAll() : await findByOrganizerId(session.user.id);
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-6xl px-4 py-10 sm:px-6">
+    <main className="mx-auto min-h-screen w-full max-w-[96rem] px-4 py-10 sm:px-6">
       <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 p-6 text-white md:flex-row md:items-end md:justify-between">
         <div>
           <p className="text-sm uppercase tracking-[0.25em] text-slate-300">Area de gestao</p>
@@ -44,6 +44,12 @@ export default async function OrganizerEventsPage() {
               <div className="flex flex-wrap gap-3">
                 <Button asChild variant="outline">
                   <Link href={`/organizer/eventos/${event._id}/editar`}>Editar</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href={`/organizer/eventos/${event._id}/ingressos`}>Ingressos & Lotes</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link href={`/organizer/eventos/${event._id}/vendas`}>Analytics</Link>
                 </Button>
                 <form action={deleteEventAction.bind(null, event._id)}>
                   <Button variant="destructive" type="submit">

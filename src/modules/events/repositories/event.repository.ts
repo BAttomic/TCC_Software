@@ -15,6 +15,29 @@ const TT = TicketType as unknown as {
   aggregate(pipeline: Array<Record<string, unknown>>): Promise<Array<{ _id: string; totalQuantity: number }>>;
 };
 
+function normalizeText(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function prioritizePreferredCity<T extends { venue: { city: string }; startsAt: Date | string }>(events: T[], preferredCity: string) {
+  const normalizedPreferredCity = normalizeText(preferredCity);
+
+  return [...events].sort((left, right) => {
+    const leftPreferred = normalizeText(left.venue.city) === normalizedPreferredCity ? 0 : 1;
+    const rightPreferred = normalizeText(right.venue.city) === normalizedPreferredCity ? 0 : 1;
+
+    if (leftPreferred !== rightPreferred) {
+      return leftPreferred - rightPreferred;
+    }
+
+    return new Date(left.startsAt).getTime() - new Date(right.startsAt).getTime();
+  });
+}
+
 export async function create(data: Omit<IEvent, "_id" | "createdAt" | "updatedAt">): Promise<IEvent> {
   return (await E.create(data)) as unknown as IEvent;
 }
@@ -43,19 +66,22 @@ export async function findPublishedFiltered(params: {
   city?: string;
   state?: string;
   search?: string;
+  preferredCity?: string;
 }): Promise<IEvent[]> {
   const filter: Record<string, unknown> = { status: EventStatus.PUBLISHED };
   if (params.city) filter["venue.city"] = params.city;
   if (params.state) filter["venue.state"] = params.state;
   if (params.search) filter.title = { $regex: params.search, $options: "i" };
-  return (await E.find(filter).sort({ startsAt: 1 }).lean()) as unknown as IEvent[];
+
+  const events = (await E.find(filter).sort({ startsAt: 1 }).lean()) as unknown as IEvent[];
+  return params.city ? events : prioritizePreferredCity(events, params.preferredCity ?? "Viçosa");
 }
 
 export type FeaturedEvent = IEvent & {
   totalTickets: number;
 };
 
-export async function findFeaturedPublished(limit = 6): Promise<{
+export async function findFeaturedPublished(limit = 6, preferredCity = "Viçosa"): Promise<{
   upcoming: FeaturedEvent[];
   largest: FeaturedEvent[];
 }> {
@@ -70,8 +96,10 @@ export async function findFeaturedPublished(limit = 6): Promise<{
     totalTickets: totalsByEvent.get(event._id) ?? 0,
   }));
 
+  const upcoming = prioritizePreferredCity(featured, preferredCity).slice(0, limit);
+
   return {
-    upcoming: featured.slice(0, limit),
+    upcoming,
     largest: [...featured].sort((left, right) => right.totalTickets - left.totalTickets).slice(0, limit),
   };
 }
