@@ -1,5 +1,7 @@
 import Ticket from "../models/ticket.model";
 import { customAlphabet } from "nanoid";
+import crypto from "crypto";
+import { env } from "@/lib/env";
 
 const nanoid = customAlphabet("1234567890abcdef", 32);
 
@@ -14,6 +16,12 @@ const T = Ticket as unknown as {
 
 export function generateCode(): string {
   return nanoid();
+}
+
+export function generateSecret(ticketId: string, ownerId: string): string {
+  const windowSeconds = 30;
+  const window = Math.floor(Date.now() / (windowSeconds * 1000));
+  return crypto.createHmac("sha256", env.TICKET_HMAC_SECRET).update(`${ticketId}:${ownerId}:${window}`).digest("hex");
 }
 
 export async function create(data: any) {

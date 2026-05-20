@@ -8,6 +8,7 @@ const E = Event as unknown as {
   find(filter: Record<string, unknown>): any;
   exists(filter: Record<string, unknown>): Promise<boolean>;
   findByIdAndUpdate(id: string, data: Partial<IEvent>, options: any): any;
+  findByIdAndDelete(id: string): any;
 };
 
 const TT = TicketType as unknown as {
@@ -28,6 +29,10 @@ export async function findBySlug(slug: string): Promise<IEvent | null> {
 
 export async function findByOrganizerId(organizerId: string): Promise<IEvent[]> {
   return (await E.find({ organizerId }).sort({ startsAt: -1 }).lean()) as unknown as IEvent[];
+}
+
+export async function findAll(): Promise<IEvent[]> {
+  return (await E.find({}).sort({ createdAt: -1 }).lean()) as unknown as IEvent[];
 }
 
 export async function findPublished(): Promise<IEvent[]> {
@@ -73,6 +78,10 @@ export async function findFeaturedPublished(limit = 6): Promise<{
 
 export async function update(id: string, data: Partial<IEvent>): Promise<IEvent | null> {
   return (await E.findByIdAndUpdate(id, data, { new: true }).lean()) as unknown as (IEvent | null);
+}
+
+export async function deleteById(id: string): Promise<IEvent | null> {
+  return (await E.findByIdAndDelete(id).lean()) as unknown as (IEvent | null);
 }
 
 export async function generateSlug(title: string): Promise<string> {

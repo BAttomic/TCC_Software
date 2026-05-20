@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { connectDB } from "@/lib/db";
 import { findBySlug } from "@/modules/events/repositories/event.repository";
+import { findByEventId } from "@/modules/events/repositories/ticket-type.repository";
+import { findActiveByTicketTypeId } from "@/modules/events/repositories/lot.repository";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +22,22 @@ export default async function EventDetailsPage({ params }: EventDetailsPageProps
   const event = await findBySlug(slug);
   if (!event) {
     notFound();
+  }
+
+  const ticketTypes = await findByEventId(event._id);
+  const options: Array<{ id: string; name: string; price: number; available: number }> = [];
+  for (const ticketType of ticketTypes) {
+    const lot = (await findActiveByTicketTypeId(ticketType._id))[0];
+    if (!lot) {
+      continue;
+    }
+
+    options.push({
+      id: ticketType._id,
+      name: ticketType.name,
+      price: lot.price ?? ticketType.price,
+      available: Math.max(0, Math.min(ticketType.totalQuantity - ticketType.soldQuantity, lot.quantity - lot.soldQuantity)),
+    });
   }
 
   return (
@@ -40,11 +58,27 @@ export default async function EventDetailsPage({ params }: EventDetailsPageProps
 
           <div className="flex flex-wrap gap-3 pt-3">
             <Button asChild>
-              <Link href="/login">Entrar para comprar</Link>
+              <Link href={`/eventos/${event.slug}/checkout`}>Comprar ingressos</Link>
             </Button>
             <Button asChild variant="outline">
               <Link href="/eventos">Voltar para eventos</Link>
             </Button>
+          </div>
+
+          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <h2 className="text-lg font-semibold text-slate-950">Ingressos e lotes</h2>
+            <div className="mt-4 space-y-3">
+              {options.map((option) => (
+                <div key={option.id} className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3">
+                  <div>
+                    <p className="font-medium text-slate-900">{option.name}</p>
+                    <p className="text-sm text-slate-600">Disponiveis: {option.available}</p>
+                  </div>
+                  <p className="font-semibold text-slate-900">R$ {(option.price / 100).toFixed(2).replace(".", ",")}</p>
+                </div>
+              ))}
+              {options.length === 0 ? <p className="text-sm text-slate-600">Ainda nao ha ingressos ativos para compra.</p> : null}
+            </div>
           </div>
         </CardContent>
       </Card>
