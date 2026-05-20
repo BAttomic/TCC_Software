@@ -5,6 +5,9 @@
  *   npx tsx scripts/seed.ts brasil
  */
 import bcrypt from "bcryptjs";
+import fs from "fs";
+import path from "path";
+import dotenv from "dotenv";
 import { connectDB } from "@/lib/db";
 import Event from "@/modules/events/models/event.model";
 import Lot from "@/modules/events/models/lot.model";
@@ -37,6 +40,14 @@ type SeedEvent = {
   durationHours: number;
   status: "published" | "draft";
 };
+
+for (const envFile of [".env.local", ".env", ".env.example"]) {
+  const envPath = path.join(process.cwd(), envFile);
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+    break;
+  }
+}
 
 const scenario = normalizeScenario(process.argv[2]);
 const SALT = 12;
