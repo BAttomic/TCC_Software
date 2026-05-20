@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { auth } from "@/lib/auth";
 import crypto from "crypto";
 import { connectDB } from "@/lib/db";
 import { findByCode, markUsed } from "@/modules/tickets/repositories/ticket.repository";
@@ -23,8 +23,8 @@ function verifyHmac(ticketCode: string, ownerId: string, providedSecret: string)
 }
 
 export async function POST(request: NextRequest) {
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-  if (!token || !["operator", "organizer", "admin"].includes(token.role as string)) {
+  const session = await auth();
+  if (!session || !["operator", "organizer", "admin"].includes(session.user.role)) {
     return NextResponse.json({ ok: false, message: "Não autorizado." }, { status: 401 });
   }
 
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, message: "QR Code inválido ou expirado. Peça para o comprador abrir o ingresso novamente." }, { status: 422 });
   }
 
-  const operatorId = token.userId as string;
+  const operatorId = session.user.id;
   await markUsed(ticket._id, operatorId);
 
   await CheckinLog.create({

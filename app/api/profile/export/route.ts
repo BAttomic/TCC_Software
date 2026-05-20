@@ -1,19 +1,19 @@
 import { NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { auth } from "@/lib/auth";
 import type { NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import { findById } from "@/modules/identity/repositories/user.repository";
 import { findByBuyerId } from "@/modules/orders/repositories/order.repository";
 import { findByOwnerId } from "@/modules/tickets/repositories/ticket.repository";
 
-export async function GET(request: NextRequest) {
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-  if (!token) {
+export async function GET(_request: NextRequest) {
+  const session = await auth();
+  if (!session) {
     return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
   }
 
   await connectDB();
-  const userId = token.userId as string;
+  const userId = session.user.id;
 
   const [user, orders, tickets] = await Promise.all([
     findById(userId),

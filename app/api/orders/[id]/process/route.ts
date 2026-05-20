@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { auth } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import Order from "@/modules/orders/models/order.model";
 import TicketType from "@/modules/events/models/ticket-type.model";
@@ -11,9 +11,9 @@ import { sendOrderConfirmationEmail } from "@/lib/email";
 
 const AUTO_APPROVE_DELAY_MS = 60_000;
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
-  if (!token) {
+export async function POST(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await auth();
+  if (!session) {
     return NextResponse.json({ ok: false, message: "Não autorizado." }, { status: 401 });
   }
 
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const order = await O.findById(id).lean();
   if (!order) return NextResponse.json({ ok: false, status: "not_found" }, { status: 404 });
 
-  if (String(order.buyerId) !== String(token.userId) && !["organizer", "admin"].includes(token.role as string)) {
+  if (String(order.buyerId) !== String(session.user.id) && !["organizer", "admin"].includes(session.user.role)) {
     return NextResponse.json({ ok: false, message: "Não autorizado." }, { status: 403 });
   }
 
