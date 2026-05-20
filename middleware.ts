@@ -2,9 +2,10 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const buyerPrefixes = ["/tickets", "/orders", "/buyer"];
+const buyerPrefixes = ["/tickets", "/orders", "/buyer", "/perfil"];
 const organizerPrefixes = ["/organizer"];
 const checkinPrefixes = ["/checkin"];
+const adminPrefixes = ["/admin"];
 
 // Security headers per spec
 // - CSP básica, X-Frame-Options DENY, Referrer-Policy strict-origin
@@ -15,6 +16,7 @@ export async function middleware(request: NextRequest) {
   const isBuyerArea = buyerPrefixes.some((prefix) => path.startsWith(prefix));
   const isOrganizerArea = organizerPrefixes.some((prefix) => path.startsWith(prefix));
   const isCheckinArea = checkinPrefixes.some((prefix) => path.startsWith(prefix));
+  const isAdminArea = adminPrefixes.some((prefix) => path.startsWith(prefix));
 
   const userRole = token?.role as string | undefined;
 
@@ -29,6 +31,10 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isCheckinArea && !["operator", "organizer", "admin"].includes(userRole ?? "")) {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
+  if (isAdminArea && userRole !== "admin") {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 

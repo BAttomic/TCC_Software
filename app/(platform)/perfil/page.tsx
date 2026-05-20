@@ -1,8 +1,9 @@
 import { connectDB } from "@/lib/db";
 import { requireRole } from "@/lib/require-role";
 import { findById } from "@/modules/identity/repositories/user.repository";
-import { updateProfileAction, changePasswordAction, deleteAccountAction } from "@/server/actions/profile.actions";
+import { updateProfileAction, changePasswordAction } from "@/server/actions/profile.actions";
 import { DataExportButton } from "@/components/shared/data-export-button";
+import { DeleteAccountButton } from "@/components/shared/delete-account-button";
 import { Button } from "@/components/ui/button";
 import { User, Lock, ShieldAlert, FileJson } from "lucide-react";
 
@@ -99,18 +100,7 @@ export default async function ProfilePage({ searchParams }: PageProps) {
         <p className="mb-4 text-sm text-rose-700">
           Excluir sua conta remove permanentemente todos os seus dados, pedidos e ingressos. Esta ação é irreversível.
         </p>
-        <form
-          action={deleteAccountAction}
-          onSubmit={(e) => {
-            if (!confirm("Tem certeza? Esta ação não pode ser desfeita.")) {
-              e.preventDefault();
-            }
-          }}
-        >
-          <Button type="submit" variant="destructive">
-            Excluir minha conta
-          </Button>
-        </form>
+        <DeleteAccountButton />
       </section>
     </main>
   );
