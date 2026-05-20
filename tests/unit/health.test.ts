@@ -1,9 +1,7 @@
 import { beforeAll, afterAll, describe, it, expect } from "vitest";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
-
-// env vars set in tests/setup.ts before this module loads
-import { connectDB, disconnectDB } from "../../src/lib/db.js";
+import { connectDB, disconnectDB } from "@/lib/db";
 
 let mongo: MongoMemoryServer | undefined;
 
@@ -11,9 +9,7 @@ describe("Health", () => {
   beforeAll(async () => {
     mongo = await MongoMemoryServer.create();
     const uri = mongo.getUri();
-    // Override MONGODB_URI after env.ts loaded with initial test value
     process.env.MONGODB_URI = uri;
-    // Re-initialize db with the new URI
     await disconnectDB();
     global.mongoose = { conn: null, promise: null };
   }, 30000);

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 // Set env before imports
 process.env.MONGODB_URI = "mongodb://localhost:27017/ticketflow-test";
@@ -9,10 +10,10 @@ process.env.NEXTAUTH_URL = "http://localhost:3000";
 process.env.JWT_SECRET = "test-jwt-secret-key-minimum-32-chars-long-xx";
 process.env.TICKET_HMAC_SECRET = "test-hmac-secret-key-minimum-16-chars";
 
-import { connectDB, disconnectDB } from "../../src/lib/db.js";
-import { RegisterSchema, LoginSchema } from "../../src/modules/identity/schemas/user.schema.js";
-import { createUser, findByEmail } from "../../src/modules/identity/repositories/user.repository.js";
-import { UserRole } from "../../src/modules/identity/models/user.model.js";
+import { connectDB, disconnectDB } from "@/lib/db";
+import { RegisterSchema, LoginSchema } from "@/modules/identity/schemas/user.schema";
+import { createUser, findByEmail } from "@/modules/identity/repositories/user.repository";
+import { UserRole } from "@/modules/identity/models/user.model";
 
 describe("User domain", () => {
   let mongo: MongoMemoryServer;
@@ -90,7 +91,7 @@ describe("User domain", () => {
     const windowSeconds = 30;
 
     const hashFn = (data: string, key: string) => {
-      return Buffer.from(`${key}:${data}`).toString("hex").slice(0, 32);
+      return crypto.createHmac("sha256", key).update(data).digest("hex");
     };
 
     const now = Date.now();

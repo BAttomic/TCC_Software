@@ -5,6 +5,7 @@ const UserModel = User as unknown as {
   create(data: any): Promise<any>;
   findOne(filter: Record<string, unknown>): any;
   findById(id: string): any;
+  findByIdAndUpdate(id: string, data: Record<string, unknown>, options: Record<string, unknown>): any;
   insertMany(docs: any[]): Promise<any[]>;
 };
 
@@ -18,6 +19,10 @@ export async function findByEmail(email: string): Promise<IUser | null> {
 
 export async function findById(id: string): Promise<IUser | null> {
   return (await UserModel.findById(id).lean()) as unknown as (IUser | null);
+}
+
+export async function updatePasswordById(id: string, passwordHash: string): Promise<IUser | null> {
+  return (await UserModel.findByIdAndUpdate(id, { passwordHash }, { new: true }).lean()) as unknown as (IUser | null);
 }
 
 export async function createDemoUsers(): Promise<IUser[]> {

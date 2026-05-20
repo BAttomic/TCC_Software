@@ -14,7 +14,7 @@ const webServerConfig = {
 } as const;
 
 export default defineConfig({
-  testDir: "./e2e",
+  testDir: "./tests/e2e",
   testMatch: /\.e2e\.(ts|tsx)$/,
   timeout: 60000,
   fullyParallel: true,
