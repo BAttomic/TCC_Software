@@ -15,8 +15,6 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "db:up": "docker-compose up -d mongo",
-    "db:down": "docker-compose down",
     "seed": "tsx scripts/seed.ts",
     "seed:vicosa": "tsx scripts/seed.ts vicosa",
     "seed:brasil": "tsx scripts/seed.ts brasil",
